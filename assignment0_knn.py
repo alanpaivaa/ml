@@ -15,57 +15,57 @@ except ModuleNotFoundError:
     plotting_available = False
 
 
-# def select_hyper_parameters(dataset, k=5):
-#     random.shuffle(dataset)
-#     fold_size = int(len(dataset) / k)
-#
-#     hidden_layers = list(range(2, 70))
-#     results = list()
-#
-#     for num_hidden in hidden_layers:
-#         # for sigma in sigmas:
-#         realizations = list()
-#         for i in range(k):
-#             test_start = i * fold_size
-#             test_end = (i + 1) * fold_size
-#
-#             # Make training and test sets
-#             training_set = list()
-#             test_set = list()
-#             for j in range(len(dataset)):
-#                 if j < test_start or j >= test_end:
-#                     training_set.append(dataset[j].copy())
-#                 else:
-#                     test_set.append(dataset[j].copy())
-#
-#             model = RBF(num_hidden=num_hidden, regression=False)
-#             model.train(training_set)
-#
-#             d = list()
-#             y = list()
-#
-#             # Validate the model
-#             for row in test_set:
-#                 d.append(row[-1])
-#                 y.append(model.predict(row[:-1]))
-#
-#             realization = Realization(training_set, test_set, None, Scores(d, y), None)
-#             realizations.append(realization)
-#
-#         accuracies = list(map(lambda r: r.scores.accuracy, realizations))
-#         mean_accuracy = mean(accuracies)
-#         print(
-#             "Hidden: {}     Accuracy: {:.2f}%".format(
-#                 num_hidden, mean_accuracy * 100
-#             )
-#         )
-#
-#         results.append((num_hidden, mean_accuracy))
-#
-#     results = sorted(results, key=lambda r: r[1], reverse=True)
-#     best_hyper_parameters = results[0]
-#     print("\n\n>>> Best hyper parameters:")
-#     print("Hidden: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1] * 100))
+def select_hyper_parameters(dataset, num_folds=5):
+    random.shuffle(dataset)
+    fold_size = int(len(dataset) / num_folds)
+
+    results = list()
+    k_range = range(1, 50)
+
+    for k in k_range:
+        # for sigma in sigmas:
+        realizations = list()
+        for i in range(num_folds):
+            test_start = i * fold_size
+            test_end = (i + 1) * fold_size
+
+            # Make training and test sets
+            training_set = list()
+            test_set = list()
+            for j in range(len(dataset)):
+                if j < test_start or j >= test_end:
+                    training_set.append(dataset[j].copy())
+                else:
+                    test_set.append(dataset[j].copy())
+
+            model = KNN(k)
+            model.train(training_set)
+
+            d = list()
+            y = list()
+
+            # Validate the model
+            for row in test_set:
+                d.append(row[-1])
+                y.append(model.predict(row[:-1]))
+
+            realization = Realization(training_set, test_set, Scores(d, y))
+            realizations.append(realization)
+
+        accuracies = list(map(lambda r: r.scores.accuracy, realizations))
+        mean_accuracy = mean(accuracies)
+        print(
+            "K: {}     Accuracy: {:.2f}%".format(
+                k, mean_accuracy * 100
+            )
+        )
+
+        results.append((k, mean_accuracy))
+
+    results = sorted(results, key=lambda r: r[1], reverse=True)
+    best_hyper_parameters = results[0]
+    print("\n\n>>> Best hyper parameters:")
+    print("K: {}     Accuracy: {:.2f}%".format(best_hyper_parameters[0], best_hyper_parameters[1] * 100))
 
 
 def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
@@ -134,25 +134,22 @@ hyper_parameters = {
     'column': (column_dataset, 7)
 }
 
-# Select best hyper parameters
-# datasets = ['artificial', 'iris', 'column', 'dermatology', 'breast_cancer']
-# for ds in datasets:
-#     print(">>>>>>>>>>>>>> {}".format(ds))
-#     dataset, _, _, _ = hyper_parameters['artificial']
-# select_hyper_parameters(dermatology_dataset.load())
-#     print("\n\n\n\n\n")
+dataset, k = hyper_parameters['column']
 
-dataset, k = hyper_parameters['artificial']
 
-split_ratio = 0.8
-num_realizations = 20
+# Optimization
+select_hyper_parameters(dataset.load(), num_folds=5)
 
-print("Dataset: {}".format(dataset.filename))
-model = KNN(k)
-evaluate(model,
-         dataset.load(),
-         normalize=True,  # TODO: Test with and without normalization
-         ratio=split_ratio,
-         num_realizations=num_realizations)
+# Evaluation
+# split_ratio = 0.8
+# num_realizations = 20
+#
+# print("Dataset: {}".format(dataset.filename))
+# model = KNN(k)
+# evaluate(model,
+#          dataset.load(),
+#          normalize=True,  # TODO: Test with and without normalization
+#          ratio=split_ratio,
+#          num_realizations=num_realizations)
 
 print("Done!")

@@ -9,7 +9,8 @@ class KNN:
     def train(self, training_set):
         self.training_set = training_set
 
-    def euclidean_distance(self, x, y):
+    @staticmethod
+    def euclidean_distance(x, y):
         summation = 0
         count = min(len(x), len(y))
         for i in range(count):
@@ -26,7 +27,8 @@ class KNN:
         result = list(map(lambda index: self.training_set[index], indexes))
         return result
 
-    def max_class(self, neighbors):
+    @staticmethod
+    def max_class(neighbors):
         count = dict()
         for row in neighbors:
             klass = row[-1]
