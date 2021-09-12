@@ -8,7 +8,7 @@ from knn.normalizer import Normalizer
 
 # Import plotting modules, if they're available
 try:
-    from assignment7.plot_helper import plot_decision_surface, plot_regression_surface
+    from knn.plot_helper import plot_decision_surface
     import matplotlib.pyplot as plt
     plotting_available = True
 except ModuleNotFoundError:
