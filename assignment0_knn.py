@@ -33,15 +33,21 @@ def parse_args():
     return args.model, args.dataset
 
 
-def select_hyper_parameters(dataset, model_class, num_folds=5):
-    random.shuffle(dataset)
-    fold_size = int(len(dataset) / num_folds)
+def select_hyper_parameters(model_class, dataset, normalize, num_folds=5):
+    if normalize:
+        normalizer = Normalizer()
+        normalizer.fit(dataset)
+        normalized_dataset = [normalizer.normalize(row[:-1]) + [row[-1]] for row in dataset]
+    else:
+        normalized_dataset = dataset
+
+    random.shuffle(normalized_dataset)
+    fold_size = int(len(normalized_dataset) / num_folds)
 
     results = list()
     k_range = range(1, 50)
 
     for k in k_range:
-        # for sigma in sigmas:
         realizations = list()
         for i in range(num_folds):
             test_start = i * fold_size
@@ -50,11 +56,11 @@ def select_hyper_parameters(dataset, model_class, num_folds=5):
             # Make training and test sets
             training_set = list()
             test_set = list()
-            for j in range(len(dataset)):
+            for j in range(len(normalized_dataset)):
                 if j < test_start or j >= test_end:
-                    training_set.append(dataset[j].copy())
+                    training_set.append(normalized_dataset[j].copy())
                 else:
-                    test_set.append(dataset[j].copy())
+                    test_set.append(normalized_dataset[j].copy())
 
             kwargs = {'k': k}
             model = model_class(**kwargs)
@@ -136,8 +142,9 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-model_name = 'knn'
+model_name = 'dmc'
 dataset_name = 'artificial'
+normalize = False
 # model_name, dataset_name = parse_args()
 
 models = {
@@ -150,17 +157,30 @@ dataset = Dataset("knn/datasets/{}.csv".format(dataset_name))
 print("Dataset: {}".format(dataset.filename))
 
 # Optimization
-# select_hyper_parameters(dataset.load(), models[model_name], num_folds=5)
+# select_hyper_parameters(model_class=models[model_name],
+#                         dataset=dataset.load(),
+#                         normalize=normalize,
+#                         num_folds=5)
 
 # Best hyper parameter found using grid search with k-fold cross validation
-hyper_parameters = {
-    ('knn', 'artificial'): {'k': 1},
-    ('knn', 'iris'): {'k': 10},
-    ('knn', 'column'): {'k': 7},
-    ('dmc', 'artificial'): dict(),
-    ('dmc', 'iris'): dict(),
-    ('dmc', 'column'): dict()
-}
+if normalize:  # Normalized
+    hyper_parameters = {
+        ('knn', 'artificial'): {'k': 1},
+        ('knn', 'iris'): {'k': 7},
+        ('knn', 'column'): {'k': 21},
+        ('dmc', 'artificial'): dict(),
+        ('dmc', 'iris'): dict(),
+        ('dmc', 'column'): dict()
+    }
+else:  # Un-normalized
+    hyper_parameters = {
+        ('knn', 'artificial'): {'k': 1},
+        ('knn', 'iris'): {'k': 16},
+        ('knn', 'column'): {'k': 4},
+        ('dmc', 'artificial'): dict(),
+        ('dmc', 'iris'): dict(),
+        ('dmc', 'column'): dict()
+    }
 
 model_kwargs = hyper_parameters[(model_name, dataset_name)]
 model = models[model_name](**model_kwargs)
@@ -170,7 +190,7 @@ split_ratio = 0.8
 num_realizations = 20
 evaluate(model,
          dataset.load(),
-         normalize=True,
+         normalize=normalize,
          ratio=split_ratio,
          num_realizations=num_realizations)
 
