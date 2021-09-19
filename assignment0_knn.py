@@ -137,7 +137,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
 
 
 model_name = 'knn'
-dataset_name = 'iris'
+dataset_name = 'artificial'
 # model_name, dataset_name = parse_args()
 
 models = {
@@ -170,7 +170,7 @@ split_ratio = 0.8
 num_realizations = 20
 evaluate(model,
          dataset.load(),
-         normalize=True,  # TODO: Test with and without normalization
+         normalize=True,
          ratio=split_ratio,
          num_realizations=num_realizations)
 
