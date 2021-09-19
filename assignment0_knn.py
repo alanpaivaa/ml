@@ -2,9 +2,11 @@ import random
 from knn.helpers import train_test_split, mean, standard_deviation
 from knn.dataset import Dataset
 from knn.knn import KNN
+from knn.dmc import DMC
 from knn.realization import Realization
 from knn.scores import Scores
 from knn.normalizer import Normalizer
+import argparse
 
 # Import plotting modules, if they're available
 try:
@@ -15,7 +17,23 @@ except ModuleNotFoundError:
     plotting_available = False
 
 
-def select_hyper_parameters(dataset, num_folds=5):
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m",
+                        "--model",
+                        help="The model to use. Choose knn or dmc.",
+                        required=True,
+                        choices=['knn', 'dmc'])
+    parser.add_argument("-d",
+                        "--dataset",
+                        help="The dataset to use. Choose iris, column or artificial.",
+                        required=True,
+                        choices=['iris', 'column', 'artificial'])
+    args = parser.parse_args()
+    return args.model, args.dataset
+
+
+def select_hyper_parameters(dataset, model_class, num_folds=5):
     random.shuffle(dataset)
     fold_size = int(len(dataset) / num_folds)
 
@@ -38,7 +56,8 @@ def select_hyper_parameters(dataset, num_folds=5):
                 else:
                     test_set.append(dataset[j].copy())
 
-            model = KNN(k)
+            kwargs = {'k': k}
+            model = model_class(**kwargs)
             model.train(training_set)
 
             d = list()
@@ -117,39 +136,42 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-# Dataset descriptors (lazy loaded)
-# Artificial
-artificial_dataset = Dataset("knn/datasets/artificial.csv")
+model_name = 'dmc'
+dataset_name = 'iris'
+# model_name, dataset_name = parse_args()
 
-# Iris
-iris_dataset = Dataset("knn/datasets/iris.csv")
+models = {
+    'knn': KNN,
+    'dmc': DMC
+}
 
-# Vertebral column
-column_dataset = Dataset("knn/datasets/vertebral-column.csv")
+# Dataset descriptor, lazy loaded
+dataset = Dataset("knn/datasets/{}.csv".format(dataset_name))
+print("Dataset: {}".format(dataset.filename))
+
+# Optimization
+# select_hyper_parameters(dataset.load(), models[model_name], num_folds=5)
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    'artificial': (artificial_dataset, 7),
-    'iris': (iris_dataset, 7),
-    'column': (column_dataset, 7)
+    ('knn', 'artificial'): {'k': 7},
+    ('knn', 'iris'): {'k': 7},
+    ('knn', 'column'): {'k': 7},
+    ('dmc', 'artificial'): dict(),
+    ('dmc', 'iris'): dict(),
+    ('dmc', 'column'): dict()
 }
 
-dataset, k = hyper_parameters['column']
-
-
-# Optimization
-select_hyper_parameters(dataset.load(), num_folds=5)
+model_kwargs = hyper_parameters[(model_name, dataset_name)]
+model = models[model_name](**model_kwargs)
 
 # Evaluation
-# split_ratio = 0.8
-# num_realizations = 20
-#
-# print("Dataset: {}".format(dataset.filename))
-# model = KNN(k)
-# evaluate(model,
-#          dataset.load(),
-#          normalize=True,  # TODO: Test with and without normalization
-#          ratio=split_ratio,
-#          num_realizations=num_realizations)
+split_ratio = 0.8
+num_realizations = 20
+evaluate(model,
+         dataset.load(),
+         normalize=True,  # TODO: Test with and without normalization
+         ratio=split_ratio,
+         num_realizations=num_realizations)
 
 print("Done!")

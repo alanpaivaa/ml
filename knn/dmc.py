@@ -1,12 +1,12 @@
-from assignment0.knn import KNN
+from knn.knn import KNN
 
 
 class DMC(KNN):
     def __init__(self):
-        centroids_per_class = 1
-        super().__init__(centroids_per_class)
+        super().__init__(1)
 
-    def get_centroids(self, points):
+    @staticmethod
+    def get_centroids(points):
         # Group rows by class
         groups = dict()
         for row in points:
@@ -14,8 +14,6 @@ class DMC(KNN):
             if groups.get(klass) is None:
                 groups[klass] = list()
             groups[klass].append(row)
-
-        max_class = max(groups.keys())
 
         # Create centroids
         centroids = list()
