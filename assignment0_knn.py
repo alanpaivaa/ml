@@ -136,7 +136,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-model_name = 'dmc'
+model_name = 'knn'
 dataset_name = 'iris'
 # model_name, dataset_name = parse_args()
 
@@ -154,8 +154,8 @@ print("Dataset: {}".format(dataset.filename))
 
 # Best hyper parameter found using grid search with k-fold cross validation
 hyper_parameters = {
-    ('knn', 'artificial'): {'k': 7},
-    ('knn', 'iris'): {'k': 7},
+    ('knn', 'artificial'): {'k': 1},
+    ('knn', 'iris'): {'k': 10},
     ('knn', 'column'): {'k': 7},
     ('dmc', 'artificial'): dict(),
     ('dmc', 'iris'): dict(),
