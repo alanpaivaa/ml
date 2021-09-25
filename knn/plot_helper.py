@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def plot_decision_surface(model, dataset, offset=0, title=None, xlabel=None, ylabel=None, legend=None):
+def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, legend=None):
     np_dataset = np.array(dataset)
     offset_percentage = 0.06
 
@@ -26,7 +26,10 @@ def plot_decision_surface(model, dataset, offset=0, title=None, xlabel=None, yla
         points = grid[predictions == c]
         plt.scatter(points[:, 0], points[:, 1], marker="s", color=colors[c], alpha=0.05)
         set_points = np_dataset[np_dataset[:, -1] == c]
-        plt.scatter(set_points[:, 0], set_points[:, 1], color=colors[c], marker=markers[c])
+        label = None
+        if legend is not None:
+            label = legend[c]
+        plt.scatter(set_points[:, 0], set_points[:, 1], color=colors[c], marker=markers[c], label=label)
 
     plt.margins(x=0, y=0)
 
