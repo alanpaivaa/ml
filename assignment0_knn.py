@@ -142,10 +142,10 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-model_name = 'dmc'
-dataset_name = 'artificial'
-normalize = False
-# model_name, dataset_name = parse_args()
+# model_name = 'dmc'
+# dataset_name = 'artificial'
+normalize = True
+model_name, dataset_name = parse_args()
 
 models = {
     'knn': KNN,
