@@ -13,3 +13,11 @@ dataset = load_dataset('bayes/datasets/iris.csv')
 
 model = GaussianBayes()
 model.train(dataset)
+
+count = 0
+for point in dataset:
+    expected = int(point[-1])
+    predicted = model.predict(point[:-1])
+    if expected == predicted:
+        count += 1
+print(count / 150)
