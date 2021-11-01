@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from bayes.helpers import univariate_gaussians
 
 
 def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, legend=None):
@@ -19,7 +20,7 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
     predictions = np.array([model.predict(row) for row in grid])
 
     classes = np.unique(predictions)
-    colors = ["cornflowerblue", "forestgreen", "salmon"]
+    colors = ["cornflowerblue", "forestgreen", "purple"]
     markers = ["o", "*", "^"]
     for c in classes:
         points = grid[predictions == c]
@@ -44,4 +45,15 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
     if legend is not None:
         plt.legend()
 
+    plt.show()
+
+
+def plot_pdf(dataset, col):
+    num_classes = int(np.max(dataset[:, -1]) + 1)
+    gaussians = univariate_gaussians(dataset, col)
+    colors = ["cornflowerblue", "forestgreen", "purple"]
+    for c in range(num_classes):
+        xc = dataset[dataset[:, -1] == c][:, col]
+        plt.hist(xc, density=True, color=colors[c], alpha=0.25, stacked=True)
+        plt.plot(gaussians[c][0], gaussians[c][1], color=colors[c])
     plt.show()
