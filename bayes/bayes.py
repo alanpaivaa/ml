@@ -36,18 +36,17 @@ class GaussianBayes:
             cm.append(np.cov(xc, rowvar=False))  # Quadratic
         self.cov_matrix = np.array(cm)
 
-    def predict(self, x):
-        d = x.shape[0]
-        p_x = list()
-        evidence = list()
+    def predict(self, x_t):
+        g_x = list()
         for c in range(self.num_classes):
-            det_cov_matrix = np.linalg.det(self.cov_matrix[c])
-            p = 1 / np.power(2 * np.pi, d / 2) * np.sqrt(det_cov_matrix)
-            p *= np.exp(-0.5 * ((x - self.means[c]).reshape((1, d)) @ np.linalg.inv(self.cov_matrix[c]) @ (x - self.means[c]).reshape(d, 1)).item())
-            p *= self.priori[c]
-            p_x.append(p)
-            evidence.append(p)
-        p_x = np.array(p_x)
-        p = np.array(evidence).sum()
-        p_x = p_x / p
-        return np.argmax(np.array(p_x))
+            cov_inv = np.linalg.inv(self.cov_matrix[c])
+            g_i = -0.5 * (x_t @ cov_inv @ x_t.T)
+            g_i += 0.5 * (x_t @ cov_inv @ self.means[c].T)
+            g_i -= 0.5 * (self.means[c] @ cov_inv @ self.means[c].T)
+            g_i += 0.5 * (self.means[c] @ cov_inv @ x_t)
+            g_i += np.log(self.priori[c])
+            g_i -= 0.5 * np.log(2 * np.pi)
+            g_i -= 0.5 * np.log(np.linalg.det(self.cov_matrix[c]))
+            g_x.append(g_i)
+        return np.argmax(np.array(g_x))
+

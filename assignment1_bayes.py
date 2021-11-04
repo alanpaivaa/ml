@@ -82,7 +82,7 @@ column_dataset = Dataset("bayes/datasets/column.csv")
 artificial_dataset = Dataset("bayes/datasets/artificial.csv")
 dermatology_dataset = Dataset("bayes/datasets/dermatology.csv")
 breast_cancer_dataset = Dataset("bayes/datasets/breast-cancer.csv")
-dataset = breast_cancer_dataset
+dataset = iris_dataset
 
 # Plot PDF for a column of dataset
 # plot_pdf(dataset.load(), 1)
