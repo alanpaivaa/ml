@@ -33,7 +33,7 @@ class GaussianBayes:
         cm = list()
         for c in range(self.num_classes):
             xc = dataset[dataset[:, -1] == c][:, :-1]
-            cm.append(np.cov(xc, rowvar=False))
+            cm.append(np.cov(xc, rowvar=False))  # Quadratic
         self.cov_matrix = np.array(cm)
 
     def predict(self, x):

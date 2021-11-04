@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 
 
+def write_dataset(dataset, filename):
+    df = pd.DataFrame(dataset)
+    # Change last column to integer
+    df.iloc[:, -1] = df.iloc[:, -1].astype('int')
+    df.to_csv(filename, header=False, index=False)
+
+
 def load_dataset(filename):
     df = pd.read_csv(filename, header=None)
     num_columns = len(df.columns)
