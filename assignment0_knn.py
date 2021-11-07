@@ -142,10 +142,10 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-# model_name = 'dmc'
-# dataset_name = 'artificial'
+model_name = 'dmc'
+dataset_name = 'breast-cancer'
 normalize = True
-model_name, dataset_name = parse_args()
+# model_name, dataset_name = parse_args()
 
 models = {
     'knn': KNN,
@@ -168,18 +168,22 @@ if normalize:  # Normalized
         ('knn', 'artificial'): {'k': 1},
         ('knn', 'iris'): {'k': 7},
         ('knn', 'column'): {'k': 21},
+        ('knn', 'breast-cancer'): {'k': 10},
         ('dmc', 'artificial'): dict(),
         ('dmc', 'iris'): dict(),
-        ('dmc', 'column'): dict()
+        ('dmc', 'column'): dict(),
+        ('dmc', 'breast-cancer'): dict()
     }
 else:  # Un-normalized
     hyper_parameters = {
         ('knn', 'artificial'): {'k': 1},
         ('knn', 'iris'): {'k': 16},
         ('knn', 'column'): {'k': 4},
+        ('knn', 'breast-cancer'): {'k': 15},
         ('dmc', 'artificial'): dict(),
         ('dmc', 'iris'): dict(),
-        ('dmc', 'column'): dict()
+        ('dmc', 'column'): dict(),
+        ('dmc', 'breast-cancer'): dict()
     }
 
 model_kwargs = hyper_parameters[(model_name, dataset_name)]
