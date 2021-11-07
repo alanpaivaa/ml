@@ -48,12 +48,27 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
     plt.show()
 
 
-def plot_pdf(dataset, col):
+def plot_pdf(dataset, col, title=None, x_label=None, y_label=None, legend=None):
     num_classes = int(np.max(dataset[:, -1]) + 1)
     gaussians = univariate_gaussians(dataset, col)
     colors = ["cornflowerblue", "forestgreen", "purple"]
     for c in range(num_classes):
         xc = dataset[dataset[:, -1] == c][:, col]
         plt.hist(xc, density=True, color=colors[c], alpha=0.25, stacked=True)
-        plt.plot(gaussians[c][0], gaussians[c][1], color=colors[c])
+        label = None
+        if legend is not None:
+            label = legend[c]
+        plt.plot(gaussians[c][0], gaussians[c][1], color=colors[c], label=label)
+
+    if title is not None:
+        plt.title(title)
+
+    if x_label is not None:
+        plt.xlabel(x_label)
+
+    if y_label is not None:
+        plt.ylabel(y_label)
+
+    if legend is not None:
+        plt.legend()
     plt.show()

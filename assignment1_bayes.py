@@ -102,21 +102,25 @@ datasets = {
     'iris': iris_dataset
 }
 
-# dataset = iris_dataset
+# dataset = artificial_dataset
 dataset = datasets[parse_args()]
 
 # Plot PDF for a column of dataset
-# plot_pdf(dataset.load(), 1)
+# plot_pdf(dataset.load(), 0,
+#          title="PDF - Artificial",
+#          x_label="X1",
+#          y_label="Densidade",
+#          legend=None)
 
-split_ratio = 0.8
-num_realizations = 20
-
-print("Dataset: {}".format(dataset.filename))
-model = GaussianBayes()
-evaluate(model,
-         dataset.load(),
-         normalize=True,
-         ratio=split_ratio,
-         num_realizations=num_realizations)
+# split_ratio = 0.8
+# num_realizations = 20
+#
+# print("Dataset: {}".format(dataset.filename))
+# model = GaussianBayes()
+# evaluate(model,
+#          dataset.load(),
+#          normalize=True,
+#          ratio=split_ratio,
+#          num_realizations=num_realizations)
 
 print("Done!")
