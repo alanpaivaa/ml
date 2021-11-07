@@ -79,9 +79,9 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
         model.cov_matrix = avg_realization.cov_matrix
         plot_decision_surface(model,
                               normalized_dataset,
-                              title="Superfície de Decisão",
+                              title="Íris",
                               xlabel="X1",
-                              ylabel="X2")
+                              ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
 
 
 # Generate artificial dataset
@@ -102,25 +102,26 @@ datasets = {
     'iris': iris_dataset
 }
 
-# dataset = artificial_dataset
+# dataset = iris_dataset
 dataset = datasets[parse_args()]
 
 # Plot PDF for a column of dataset
-# plot_pdf(dataset.load(), 0,
-#          title="PDF - Artificial",
-#          x_label="X1",
+# col = 0
+# plot_pdf(dataset.load(), col,
+#          title="PDF - Coluna",
+#          x_label="X%d" % (col + 1),
 #          y_label="Densidade",
 #          legend=None)
 
-# split_ratio = 0.8
-# num_realizations = 20
-#
-# print("Dataset: {}".format(dataset.filename))
-# model = GaussianBayes()
-# evaluate(model,
-#          dataset.load(),
-#          normalize=True,
-#          ratio=split_ratio,
-#          num_realizations=num_realizations)
+split_ratio = 0.8
+num_realizations = 20
+
+print("Dataset: {}".format(dataset.filename))
+model = GaussianBayes()
+evaluate(model,
+         dataset.load(),
+         normalize=True,
+         ratio=split_ratio,
+         num_realizations=num_realizations)
 
 print("Done!")
