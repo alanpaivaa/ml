@@ -1,4 +1,3 @@
-import random
 from bayes.helpers import train_test_split
 import numpy as np
 from bayes.dataset import Dataset, generate_artificial_dataset
@@ -6,6 +5,7 @@ from bayes.bayes import GaussianBayes
 from bayes.realization import Realization
 from bayes.scores import Scores
 from bayes.normalizer import Normalizer
+import argparse
 
 # Import plotting modules, if they're available
 try:
@@ -15,6 +15,17 @@ try:
     plotting_available = True
 except ModuleNotFoundError:
     plotting_available = False
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d",
+                        "--dataset",
+                        help="The dataset to use. Choose iris, column or artificial.",
+                        required=True,
+                        choices=['artificial', 'breast-cancer', 'column', 'dermatology', 'iris'])
+    args = parser.parse_args()
+    return args.dataset
 
 
 def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
@@ -77,12 +88,22 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
 # generate_artificial_dataset(plotting_available)
 
 # Dataset descriptors (lazy loaded)
-iris_dataset = Dataset("bayes/datasets/iris.csv")
-column_dataset = Dataset("bayes/datasets/column.csv")
 artificial_dataset = Dataset("bayes/datasets/artificial.csv")
-dermatology_dataset = Dataset("bayes/datasets/dermatology.csv")
 breast_cancer_dataset = Dataset("bayes/datasets/breast-cancer.csv")
-dataset = iris_dataset
+column_dataset = Dataset("bayes/datasets/column.csv")
+dermatology_dataset = Dataset("bayes/datasets/dermatology.csv")
+iris_dataset = Dataset("bayes/datasets/iris.csv")
+
+datasets = {
+    'artificial': artificial_dataset,
+    'breast-cancer': breast_cancer_dataset,
+    'column': column_dataset,
+    'dermatology': dermatology_dataset,
+    'iris': iris_dataset
+}
+
+# dataset = iris_dataset
+dataset = datasets[parse_args()]
 
 # Plot PDF for a column of dataset
 # plot_pdf(dataset.load(), 1)
