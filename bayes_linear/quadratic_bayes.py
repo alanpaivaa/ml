@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class GaussianBayes:
+class QuadraticBayes:
     def __init__(self):
         self.num_classes = None
         self.means = None
@@ -36,17 +36,20 @@ class GaussianBayes:
             cm.append(np.cov(xc, rowvar=False))  # Quadratic
         self.cov_matrix = np.array(cm)
 
+    def cov_matrix_for_class(self, c):
+        return self.cov_matrix[c]
+
     def predict(self, x_t):
         g_x = list()
         for c in range(self.num_classes):
-            cov_inv = np.linalg.inv(self.cov_matrix[c])
+            cov = self.cov_matrix_for_class(c)
+            cov_inv = np.linalg.inv(cov)
             g_i = -0.5 * (x_t @ cov_inv @ x_t.T)
             g_i += 0.5 * (x_t @ cov_inv @ self.means[c].T)
             g_i -= 0.5 * (self.means[c] @ cov_inv @ self.means[c].T)
             g_i += 0.5 * (self.means[c] @ cov_inv @ x_t)
             g_i += np.log(self.priori[c])
             g_i -= 0.5 * np.log(2 * np.pi)
-            g_i -= 0.5 * np.log(np.linalg.det(self.cov_matrix[c]))
+            g_i -= 0.5 * np.log(np.linalg.det(cov))
             g_x.append(g_i)
         return np.argmax(np.array(g_x))
-

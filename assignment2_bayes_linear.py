@@ -1,7 +1,8 @@
 from bayes_linear.helpers import train_test_split
 import numpy as np
 from bayes_linear.dataset import Dataset
-from bayes_linear.bayes import GaussianBayes
+from bayes_linear.quadratic_bayes import QuadraticBayes
+from bayes_linear.linear_bayes import LinearBayes
 from bayes_linear.realization import Realization
 from bayes.scores import Scores
 from bayes_linear.normalizer import Normalizer
@@ -102,7 +103,7 @@ datasets = {
     'iris': iris_dataset
 }
 
-dataset = iris_dataset
+dataset = dermatology_dataset
 # dataset = datasets[parse_args()]
 
 # Plot PDF for a column of dataset
@@ -117,7 +118,8 @@ split_ratio = 0.8
 num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
-model = GaussianBayes()
+# model = GaussianBayes()
+model = LinearBayes()
 evaluate(model,
          dataset.load(),
          normalize=True,
