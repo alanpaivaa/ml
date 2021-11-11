@@ -2,7 +2,7 @@ from bayes_linear.helpers import train_test_split
 import numpy as np
 from bayes_linear.dataset import Dataset
 from bayes_linear.quadratic_bayes import QuadraticBayes
-from bayes_linear.linear_bayes import LinearBayes
+from bayes_linear.linear_bayes import LinearBayes, LINEAR_AGGREGATION_POOL, LINEAR_AGGREGATION_NAIVE
 from bayes_linear.realization import Realization
 from bayes.scores import Scores
 from bayes_linear.normalizer import Normalizer
@@ -119,7 +119,7 @@ num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
 # model = GaussianBayes()
-model = LinearBayes()
+model = LinearBayes(aggregation=LINEAR_AGGREGATION_POOL)
 evaluate(model,
          dataset.load(),
          normalize=True,
