@@ -4,6 +4,7 @@ from bayes_linear.quadratic_bayes import QuadraticBayes
 AGGREGATION_NAIVE = 'naive'
 AGGREGATION_POOL = 'pool'
 AGGREGATION_DIAGONAL_VARIANCE = 'diagonal_variance'
+AGGREGATION_DIAGONAL_EQUAL_PRIORI = 'diagonal_equal_priori'
 
 
 class LinearBayes(QuadraticBayes):
@@ -11,13 +12,18 @@ class LinearBayes(QuadraticBayes):
         super().__init__()
         self.aggregation = aggregation
 
-    # TODO: Refactor to be SOLID
+    def generate_priori(self, dataset):
+        if self.aggregation == AGGREGATION_DIAGONAL_EQUAL_PRIORI:
+            self.priori = np.ones(self.num_classes) / self.num_classes
+        else:
+            super().generate_priori(dataset)
+
     def generate_cov_matrix(self, dataset):
         if self.aggregation == AGGREGATION_NAIVE:
             self.aggregate_naive(dataset)
         elif self.aggregation == AGGREGATION_POOL:
             self.aggregate_pool(dataset)
-        elif self.aggregation == AGGREGATION_DIAGONAL_VARIANCE:
+        elif self.aggregation == AGGREGATION_DIAGONAL_VARIANCE or self.aggregation == AGGREGATION_DIAGONAL_EQUAL_PRIORI:
             self.aggregate_diagonal_variance(dataset)
         else:
             raise Exception("Invalid aggregation")

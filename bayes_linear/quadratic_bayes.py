@@ -33,7 +33,7 @@ class QuadraticBayes:
         cm = list()
         for c in range(self.num_classes):
             xc = dataset[dataset[:, -1] == c][:, :-1]
-            cm.append(np.cov(xc, rowvar=False))  # Quadratic
+            cm.append(np.cov(xc, rowvar=False))
         self.cov_matrix = np.array(cm)
 
     def cov_matrix_for_class(self, c):

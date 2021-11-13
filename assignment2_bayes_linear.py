@@ -2,7 +2,8 @@ from bayes_linear.helpers import train_test_split
 import numpy as np
 from bayes_linear.dataset import Dataset
 from bayes_linear.quadratic_bayes import QuadraticBayes
-from bayes_linear.linear_bayes import LinearBayes, AGGREGATION_POOL, AGGREGATION_NAIVE, AGGREGATION_DIAGONAL_VARIANCE
+from bayes_linear.linear_bayes import LinearBayes, AGGREGATION_POOL, AGGREGATION_NAIVE,\
+    AGGREGATION_DIAGONAL_VARIANCE, AGGREGATION_DIAGONAL_EQUAL_PRIORI
 from bayes_linear.realization import Realization
 from bayes.scores import Scores
 from bayes_linear.normalizer import Normalizer
@@ -103,7 +104,7 @@ datasets = {
     'iris': iris_dataset
 }
 
-dataset = artificial_dataset
+dataset = iris_dataset
 # dataset = datasets[parse_args()]
 
 # Plot PDF for a column of dataset
@@ -119,7 +120,7 @@ num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
 # model = GaussianBayes()
-model = LinearBayes(aggregation=AGGREGATION_DIAGONAL_VARIANCE)
+model = LinearBayes(aggregation=AGGREGATION_DIAGONAL_EQUAL_PRIORI)
 evaluate(model,
          dataset.load(),
          normalize=True,
