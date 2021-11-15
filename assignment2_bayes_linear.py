@@ -26,8 +26,32 @@ def parse_args():
                         help="The dataset to use. Choose iris, column or artificial.",
                         required=True,
                         choices=['artificial', 'breast-cancer', 'column', 'dermatology', 'iris'])
+    parser.add_argument("-t",
+                        "--discriminant",
+                        help="The type of the discriminant to use",
+                        choices=["d1", "d2", "d3", "d4", "d5"])
     args = parser.parse_args()
-    return args.dataset
+
+    if args.discriminant is None:
+        print("Discriminant is required")
+        exit(1)
+
+    if args.discriminant == "d1":
+        model = QuadraticBayes()
+    else:
+        agg = {
+            "d2": AGGREGATION_NAIVE,
+            "d3": AGGREGATION_POOL,
+            "d4": AGGREGATION_DIAGONAL_VARIANCE,
+            "d5": AGGREGATION_DIAGONAL_EQUAL_PRIORI
+        }
+        if agg.get(args.discriminant) is None:
+            print("Invalid linear aggregation")
+            exit(1)
+        model = LinearBayes(aggregation=agg[args.discriminant])
+
+    dataset = Dataset("bayes_linear/datasets/%s.csv" % args.dataset)
+    return dataset, model
 
 
 def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
@@ -86,41 +110,30 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
 
 
-# Generate artificial dataset
-# generate_artificial_dataset(plotting_available)
-
 # Dataset descriptors (lazy loaded)
-artificial_dataset = Dataset("bayes_linear/datasets/artificial.csv")
-breast_cancer_dataset = Dataset("bayes_linear/datasets/breast-cancer.csv")
-column_dataset = Dataset("bayes_linear/datasets/column.csv")
-dermatology_dataset = Dataset("bayes_linear/datasets/dermatology.csv")
-iris_dataset = Dataset("bayes_linear/datasets/iris.csv")
+# artificial_dataset = Dataset("bayes_linear/datasets/artificial.csv")
+# breast_cancer_dataset = Dataset("bayes_linear/datasets/breast-cancer.csv")
+# column_dataset = Dataset("bayes_linear/datasets/column.csv")
+# dermatology_dataset = Dataset("bayes_linear/datasets/dermatology.csv")
+# iris_dataset = Dataset("bayes_linear/datasets/iris.csv")
+#
+# datasets = {
+#     'artificial': artificial_dataset,
+#     'breast-cancer': breast_cancer_dataset,
+#     'column': column_dataset,
+#     'dermatology': dermatology_dataset,
+#     'iris': iris_dataset
+# }
+# dataset = iris_dataset
 
-datasets = {
-    'artificial': artificial_dataset,
-    'breast-cancer': breast_cancer_dataset,
-    'column': column_dataset,
-    'dermatology': dermatology_dataset,
-    'iris': iris_dataset
-}
-
-dataset = iris_dataset
-# dataset = datasets[parse_args()]
-
-# Plot PDF for a column of dataset
-# col = 0
-# plot_pdf(dataset.load(), col,
-#          title="PDF - Coluna",
-#          x_label="X%d" % (col + 1),
-#          y_label="Densidade",
-#          legend=None)
+dataset, model = parse_args()
 
 split_ratio = 0.8
 num_realizations = 20
 
-print("Dataset: {}".format(dataset.filename))
+# print("Dataset: {}".format(dataset.filename))
 # model = GaussianBayes()
-model = LinearBayes(aggregation=AGGREGATION_DIAGONAL_EQUAL_PRIORI)
+# model = LinearBayes(aggregation=AGGREGATION_DIAGONAL_EQUAL_PRIORI)
 evaluate(model,
          dataset.load(),
          normalize=True,

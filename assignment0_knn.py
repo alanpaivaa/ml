@@ -142,7 +142,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X2")
 
 
-model_name = 'dmc'
+model_name = 'knn'
 dataset_name = 'iris'
 normalize = True
 # model_name, dataset_name = parse_args()
@@ -169,6 +169,7 @@ if normalize:  # Normalized
         ('knn', 'iris'): {'k': 7},
         ('knn', 'column'): {'k': 21},
         ('knn', 'breast-cancer'): {'k': 10},
+        ('knn', 'dermatology'): {'k': 5},
         ('dmc', 'artificial'): dict(),
         ('dmc', 'iris'): dict(),
         ('dmc', 'column'): dict(),
