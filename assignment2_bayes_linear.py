@@ -5,7 +5,7 @@ from bayes_linear.quadratic_bayes import QuadraticBayes
 from bayes_linear.linear_bayes import LinearBayes, AGGREGATION_POOL, AGGREGATION_NAIVE,\
     AGGREGATION_DIAGONAL_VARIANCE, AGGREGATION_DIAGONAL_EQUAL_PRIORI
 from bayes_linear.realization import Realization
-from bayes.scores import Scores
+from bayes_linear.scores import Scores
 from bayes_linear.normalizer import Normalizer
 import argparse
 
