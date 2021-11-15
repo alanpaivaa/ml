@@ -20,8 +20,8 @@ def plot_decision_surface(model, dataset, title=None, xlabel=None, ylabel=None, 
     predictions = np.array([model.predict(row) for row in grid])
 
     classes = np.unique(predictions)
-    colors = ["cornflowerblue", "forestgreen", "purple"]
-    markers = ["o", "*", "^"]
+    colors = ["cornflowerblue", "forestgreen", "purple", "brown", "yellow", "orange"]
+    markers = ["o", "*", "^", "s", "p", "h"]
     for c in classes:
         points = grid[predictions == c]
         plt.scatter(points[:, 0], points[:, 1], marker="s", color=colors[c], alpha=0.05)

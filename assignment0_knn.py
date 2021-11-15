@@ -143,7 +143,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
 
 
 model_name = 'dmc'
-dataset_name = 'breast-cancer'
+dataset_name = 'iris'
 normalize = True
 # model_name, dataset_name = parse_args()
 
@@ -172,7 +172,8 @@ if normalize:  # Normalized
         ('dmc', 'artificial'): dict(),
         ('dmc', 'iris'): dict(),
         ('dmc', 'column'): dict(),
-        ('dmc', 'breast-cancer'): dict()
+        ('dmc', 'breast-cancer'): dict(),
+        ('dmc', 'dermatology'): dict()
     }
 else:  # Un-normalized
     hyper_parameters = {
@@ -183,7 +184,8 @@ else:  # Un-normalized
         ('dmc', 'artificial'): dict(),
         ('dmc', 'iris'): dict(),
         ('dmc', 'column'): dict(),
-        ('dmc', 'breast-cancer'): dict()
+        ('dmc', 'breast-cancer'): dict(),
+        ('dmc', 'dermatology'): dict()
     }
 
 model_kwargs = hyper_parameters[(model_name, dataset_name)]
