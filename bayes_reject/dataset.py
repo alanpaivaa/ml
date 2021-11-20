@@ -1,13 +1,14 @@
-from bayes_reject.helpers import load_dataset
-import random
 import numpy as np
+import matplotlib.pyplot as plt
+from bayes_reject.helpers import load_dataset
 
 
 class Dataset:
-    def __init__(self, filename, encoding=None, features=None):
+    def __init__(self, filename, encoding=None, features=None, klass=None):
         self.filename = filename
         self.encoding = encoding
         self.features = features
+        self.klass = klass
 
     def load(self):
         dataset = load_dataset(self.filename)
@@ -16,16 +17,37 @@ class Dataset:
         if self.features is not None:
             dataset = dataset[:, self.features + [-1]]
 
+        if self.klass is not None:
+            in_indexes = dataset[:, -1] == self.klass
+            out_indexes = dataset[:, -1] != self.klass
+            dataset[in_indexes, -1] = [0]
+            dataset[out_indexes, -1] = [1]
+
         return dataset
 
 
-def sample_points(num_samples, x_range, y_range, space_size):
-    # Generate x and y possible values
-    x_values = np.linspace(x_range[0], x_range[1], space_size)
-    y_values = np.linspace(y_range[0], y_range[1], space_size)
+def generate_artificial_dataset():
+    x = np.linspace(0, 5, 50)
 
-    # Make coordinates as combination of x and y values
-    coordinates = [[round(x, 2), round(y, 2)] for x in x_values for y in y_values]
+    x1 = x + np.random.uniform(low=0.1, high=0.5, size=(50,))
+    c1 = -2 * x1 - np.random.uniform(low=-0.5, high=10, size=(50,))
 
-    # Sample coordinates
-    return random.choices(coordinates, k=num_samples)
+    x2 = x + np.random.uniform(low=0.1, high=0.5, size=(50,))
+    c2 = -2 * x2 + np.random.uniform(low=-0.5, high=10, size=(50,))
+
+    f1 = np.stack((x1, c1, np.zeros(x1.shape)), axis=1)
+    f2 = np.stack((x2, c2, np.ones(x2.shape)), axis=1)
+    dataset = np.concatenate((f1, f2))
+    np.random.shuffle(dataset)
+    dataset = np.round(dataset, 2)
+
+    p0 = dataset[dataset[:, -1] == 0]
+    plt.scatter(p0[:, 0], p0[:, 1])
+
+    p1 = dataset[dataset[:, -1] == 1]
+    plt.scatter(p1[:, 0], p1[:, 1])
+
+    from bayes_reject.helpers import write_dataset
+    write_dataset(dataset, 'bayes_reject/datasets/artificial.csv')
+
+    plt.show()

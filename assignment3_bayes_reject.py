@@ -111,20 +111,17 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
 
 
 # Dataset descriptors (lazy loaded)
-artificial_dataset = Dataset("bayes_reject/datasets/artificial.csv")
-breast_cancer_dataset = Dataset("bayes_reject/datasets/breast-cancer.csv")
-column_dataset = Dataset("bayes_reject/datasets/column.csv")
-dermatology_dataset = Dataset("bayes_reject/datasets/dermatology.csv")
-iris_dataset = Dataset("bayes_reject/datasets/iris.csv")
-
-datasets = {
-    'artificial': artificial_dataset,
-    'breast-cancer': breast_cancer_dataset,
-    'column': column_dataset,
-    'dermatology': dermatology_dataset,
-    'iris': iris_dataset
+dataset_params = {
+    'artificial': None,
+    'column': 2,
+    'iris': 0,
 }
-dataset = iris_dataset
+
+datasets = dict()
+for name, klass in dataset_params.items():
+    datasets[name] = Dataset("bayes_reject/datasets/%s.csv" % name, klass=klass)
+    pass
+dataset = datasets['artificial']
 
 # dataset, model = parse_args()
 
