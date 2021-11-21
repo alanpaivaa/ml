@@ -19,7 +19,7 @@ except ModuleNotFoundError:
     plotting_available = False
 
 
-def parse_args():
+def parse_args(dataset_params):
     parser = argparse.ArgumentParser()
     parser.add_argument("-d",
                         "--dataset",
@@ -37,7 +37,7 @@ def parse_args():
         exit(1)
 
     if args.discriminant == "d1":
-        model = QuadraticBayes()
+        model = QuadraticBayes(wr=0)
     else:
         agg = {
             "d2": AGGREGATION_NAIVE,
@@ -48,9 +48,9 @@ def parse_args():
         if agg.get(args.discriminant) is None:
             print("Invalid linear aggregation")
             exit(1)
-        model = LinearBayes(aggregation=agg[args.discriminant])
+        model = LinearBayes(wr=0, aggregation=agg[args.discriminant])
 
-    dataset = Dataset("bayes_reject/datasets/%s.csv" % args.dataset)
+    dataset = Dataset("bayes_reject/datasets/%s.csv" % args.dataset, klass=dataset_params[args.dataset])
     return dataset, model
 
 
@@ -63,60 +63,81 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
     else:
         normalized_dataset = dataset
 
-    realizations = list()
-    for i in range(0, num_realizations):
-        # Train the model
-        training_set, test_set = train_test_split(normalized_dataset, ratio, shuffle=True)
-        model.train(training_set)
+    wrs = [0.48, 0.36, 0.24, 0.12, 0.04]
+    wr_metrics = [list(), list()]
 
-        d = np.array([]).astype('int')
-        y = np.array([]).astype('int')
+    for wr in wrs:
+        print("Wr = {:.2f}".format(wr))
 
-        # Test the model
-        for row in test_set:
-            d = np.append(d, int(row[-1]))
-            y = np.append(y, int(model.predict(row[:-1])))
+        realizations = list()
 
-        # Caching realization values
-        realization = Realization(training_set,
-                                  test_set,
-                                  model.means,
-                                  model.cov_matrix,
-                                  model.t,
-                                  Scores(d, y))
-        print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
-        realizations.append(realization)
+        for i in range(0, num_realizations):
+            model.wr = wr
 
-    # Accuracy Stats
-    accuracies = np.array(list(map(lambda r: r.scores.accuracy, realizations)))
-    mean_accuracy = np.mean(accuracies)
-    std_accuracy = np.std(accuracies)
-    print("Accuracy: {:.2f}% ± {:.2f}%".format(mean_accuracy * 100, std_accuracy * 100))
+            # Train the model
+            training_set, test_set = train_test_split(normalized_dataset, ratio, shuffle=True)
+            model.train(training_set)
 
-    # Rejection Stats
-    rejections = np.array(list(map(lambda r: r.scores.rejection, realizations)))
-    mean_rejection = np.mean(rejections)
-    std_rejection = np.std(rejections)
-    print("Rejection: {:.2f}% ± {:.2f}%".format(mean_rejection * 100, std_rejection * 100))
+            d = np.array([]).astype('int')
+            y = np.array([]).astype('int')
 
-    # Realization whose accuracy is closest to the mean
-    avg_realization = sorted(realizations, key=lambda r: abs(mean_accuracy - r.scores.accuracy))[0]
+            # Test the model
+            for row in test_set:
+                d = np.append(d, int(row[-1]))
+                y = np.append(y, int(model.predict(row[:-1])))
 
-    print("Confusion matrix")
-    avg_realization.scores.print_confusion_matrix()
+            # Caching realization values
+            realization = Realization(training_set,
+                                      test_set,
+                                      model.means,
+                                      model.cov_matrix,
+                                      model.priori,
+                                      model.t,
+                                      Scores(d, y))
+            realizations.append(realization)
 
-    # Plot decision surface
-    if dataset.shape[1] - 1 == 2 and plotting_available:
-        # Set models with the "mean weights"
-        model.means = avg_realization.means
-        model.cov_matrix = avg_realization.cov_matrix
-        model.t = avg_realization.t
-        plot_decision_surface(model,
-                              normalized_dataset,
-                              title="Artificial",
-                              xlabel="X1",
-                              ylabel="X4",
-                              legend={0: 'Class 0', 1: 'Class 1', -1: 'Rejected'})
+        # Accuracy Stats
+        accuracies = np.array(list(map(lambda r: r.scores.accuracy, realizations)))
+        mean_accuracy = np.mean(accuracies)
+        std_accuracy = np.std(accuracies)
+        print("Accuracy: {:.2f}% ± {:.2f}%".format(mean_accuracy * 100, std_accuracy * 100))
+
+        # Rejection Stats
+        rejections = np.array(list(map(lambda r: r.scores.rejection, realizations)))
+        mean_rejection = np.mean(rejections)
+        std_rejection = np.std(rejections)
+        print("Rejection: {:.2f}% ± {:.2f}%".format(mean_rejection * 100, std_rejection * 100))
+
+        wr_metrics[0].append(mean_rejection)
+        wr_metrics[1].append(mean_accuracy)
+
+        # Realization whose accuracy is closest to the mean
+        avg_realization = sorted(realizations, key=lambda r: abs(mean_accuracy - r.scores.accuracy))[0]
+
+        # print("Confusion matrix")
+        # avg_realization.scores.print_confusion_matrix()
+
+        # Plot decision surface
+        # if dataset.shape[1] - 1 == 2 and plotting_available:
+        #     # Set models with the "mean weights"
+        #     model.means = avg_realization.means
+        #     model.cov_matrix = avg_realization.cov_matrix
+        #     model.t = avg_realization.t
+        #     plot_decision_surface(model,
+        #                           normalized_dataset,
+        #                           title="Artificial",
+        #                           xlabel="X1",
+        #                           ylabel="X4",
+        #                           legend={0: 'Class 0', 1: 'Class 1', -1: 'Rejected'})
+
+    # AR Curve
+    wr_metrics = np.array(wr_metrics)
+    plt.plot(wr_metrics[0], wr_metrics[1], marker="s", markersize=10)
+    plt.title("Curva AR")
+    plt.ylabel("Taxa de Acerto")
+    plt.xlabel("Taxa de Rejeição")
+    plt.grid(which='both')
+    plt.show()
 
 
 # Dataset descriptors (lazy loaded)
@@ -126,22 +147,21 @@ dataset_params = {
     'iris': 0,
 }
 
-datasets = dict()
-for name, klass in dataset_params.items():
-    datasets[name] = Dataset("bayes_reject/datasets/%s.csv" % name, klass=klass)
-    pass
-dataset = datasets['artificial']
+# datasets = dict()
+# for name, klass in dataset_params.items():
+#     datasets[name] = Dataset("bayes_reject/datasets/%s.csv" % name, klass=klass)
+# dataset = datasets['iris']
 
-# dataset, model = parse_args()
+dataset, model = parse_args(dataset_params)
 
-split_ratio = 0.8
+split_ratio = 0.6
 num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
-model = QuadraticBayes(0.2)
-# model = LinearBayes(wr=0.4, aggregation=AGGREGATION_POOL)
-evaluate(model,
-         dataset.load(),
+# model = QuadraticBayes(wr=0)
+# model = LinearBayes(wr=0, aggregation=AGGREGATION_POOL)
+evaluate(model=model,
+         dataset=dataset.load(),
          normalize=True,
          ratio=split_ratio,
          num_realizations=num_realizations)

@@ -11,6 +11,13 @@ class QuadraticBayes:
         self.t = None
 
     def train(self, dataset):
+        # Resetting old state
+        self.num_classes = None
+        self.means = None
+        self.cov_matrix = None
+        self.priori = None
+        self.t = None
+
         self.num_classes = np.max(dataset[:, -1]).astype(int) + 1
         self.generate_priori(dataset)
         self.generate_means(dataset)
@@ -43,7 +50,7 @@ class QuadraticBayes:
         self.cov_matrix = np.array(cm)
 
     def minimize_rejection_error(self, dataset):
-        ts = np.linspace(0, 0.5, 50)
+        ts = np.linspace(0.1, 0.45, 50)
         metrics = []
         for t in ts:
             metrics.append(self.metrics_for_t(dataset, t))
