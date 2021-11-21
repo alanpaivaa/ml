@@ -8,8 +8,8 @@ AGGREGATION_DIAGONAL_EQUAL_PRIORI = 'diagonal_equal_priori'
 
 
 class LinearBayes(QuadraticBayes):
-    def __init__(self, aggregation=AGGREGATION_NAIVE):
-        super().__init__()
+    def __init__(self, wr, aggregation=AGGREGATION_NAIVE):
+        super().__init__(wr)
         self.aggregation = aggregation
 
     def generate_priori(self, dataset):

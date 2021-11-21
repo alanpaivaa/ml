@@ -82,6 +82,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                                   test_set,
                                   model.means,
                                   model.cov_matrix,
+                                  model.t,
                                   Scores(d, y))
         print("Realization {}: {:.2f}%".format(i + 1, realization.scores.accuracy * 100))
         realizations.append(realization)
@@ -91,6 +92,12 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
     mean_accuracy = np.mean(accuracies)
     std_accuracy = np.std(accuracies)
     print("Accuracy: {:.2f}% ± {:.2f}%".format(mean_accuracy * 100, std_accuracy * 100))
+
+    # Rejection Stats
+    rejections = np.array(list(map(lambda r: r.scores.rejection, realizations)))
+    mean_rejection = np.mean(rejections)
+    std_rejection = np.std(rejections)
+    print("Rejection: {:.2f}% ± {:.2f}%".format(mean_rejection * 100, std_rejection * 100))
 
     # Realization whose accuracy is closest to the mean
     avg_realization = sorted(realizations, key=lambda r: abs(mean_accuracy - r.scores.accuracy))[0]
@@ -103,11 +110,13 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
         # Set models with the "mean weights"
         model.means = avg_realization.means
         model.cov_matrix = avg_realization.cov_matrix
+        model.t = avg_realization.t
         plot_decision_surface(model,
                               normalized_dataset,
-                              title="Íris",
+                              title="Artificial",
                               xlabel="X1",
-                              ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
+                              ylabel="X4",
+                              legend={0: 'Class 0', 1: 'Class 1', -1: 'Rejected'})
 
 
 # Dataset descriptors (lazy loaded)
@@ -129,8 +138,8 @@ split_ratio = 0.8
 num_realizations = 20
 
 print("Dataset: {}".format(dataset.filename))
-model = QuadraticBayes()
-# model = LinearBayes(aggregation=AGGREGATION_DIAGONAL_EQUAL_PRIORI)
+model = QuadraticBayes(0.2)
+# model = LinearBayes(wr=0.4, aggregation=AGGREGATION_POOL)
 evaluate(model,
          dataset.load(),
          normalize=True,
