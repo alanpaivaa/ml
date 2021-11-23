@@ -144,7 +144,7 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
 dataset_params = {
     'artificial': None,
     'column': 2,
-    'iris': 0,
+    'iris': 2,
 }
 
 # datasets = dict()
