@@ -2,8 +2,7 @@ from bayes_reject.helpers import train_test_split
 import numpy as np
 from bayes_reject.dataset import Dataset
 from bayes_reject.quadratic_bayes import QuadraticBayes
-from bayes_reject.linear_bayes import LinearBayes, AGGREGATION_POOL, AGGREGATION_NAIVE,\
-    AGGREGATION_DIAGONAL_VARIANCE, AGGREGATION_DIAGONAL_EQUAL_PRIORI
+from bayes_reject.linear_bayes import LinearBayes, AGGREGATION_POOL
 from bayes_reject.realization import Realization
 from bayes_reject.scores import Scores
 from bayes_reject.normalizer import Normalizer
@@ -29,26 +28,20 @@ def parse_args(dataset_params):
     parser.add_argument("-t",
                         "--discriminant",
                         help="The type of the discriminant to use",
-                        choices=["d1", "d2", "d3", "d4", "d5"])
+                        choices=["quad", "linear"])
     args = parser.parse_args()
 
     if args.discriminant is None:
         print("Discriminant is required")
         exit(1)
 
-    if args.discriminant == "d1":
+    if args.discriminant == "quad":
         model = QuadraticBayes(wr=0)
+    elif args.discriminant == "linear":
+        model = LinearBayes(wr=0, aggregation=AGGREGATION_POOL)
     else:
-        agg = {
-            "d2": AGGREGATION_NAIVE,
-            "d3": AGGREGATION_POOL,
-            "d4": AGGREGATION_DIAGONAL_VARIANCE,
-            "d5": AGGREGATION_DIAGONAL_EQUAL_PRIORI
-        }
-        if agg.get(args.discriminant) is None:
-            print("Invalid linear aggregation")
-            exit(1)
-        model = LinearBayes(wr=0, aggregation=agg[args.discriminant])
+        print("Invalid argument")
+        exit(1)
 
     dataset = Dataset("bayes_reject/datasets/%s.csv" % args.dataset, klass=dataset_params[args.dataset])
     return dataset, model
@@ -131,13 +124,14 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
         #                           legend={0: 'Class 0', 1: 'Class 1', -1: 'Rejected'})
 
     # AR Curve
-    wr_metrics = np.array(wr_metrics)
-    plt.plot(wr_metrics[0], wr_metrics[1], marker="s", markersize=10)
-    plt.title("Curva AR")
-    plt.ylabel("Taxa de Acerto")
-    plt.xlabel("Taxa de Rejeição")
-    plt.grid(which='both')
-    plt.show()
+    if plotting_available:
+        wr_metrics = np.array(wr_metrics)
+        plt.plot(wr_metrics[0], wr_metrics[1], marker="s", markersize=10)
+        plt.title("Curva AR")
+        plt.ylabel("Taxa de Acerto")
+        plt.xlabel("Taxa de Rejeição")
+        plt.grid(which='both')
+        plt.show()
 
 
 # Dataset descriptors (lazy loaded)

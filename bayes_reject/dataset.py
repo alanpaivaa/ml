@@ -1,6 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from bayes_reject.helpers import load_dataset
+from bayes_reject.helpers import write_dataset
 
 
 class Dataset:
@@ -41,13 +42,12 @@ def generate_artificial_dataset():
     np.random.shuffle(dataset)
     dataset = np.round(dataset, 2)
 
-    p0 = dataset[dataset[:, -1] == 0]
-    plt.scatter(p0[:, 0], p0[:, 1])
+    # p0 = dataset[dataset[:, -1] == 0]
+    # plt.scatter(p0[:, 0], p0[:, 1])
+    #
+    # p1 = dataset[dataset[:, -1] == 1]
+    # plt.scatter(p1[:, 0], p1[:, 1])
 
-    p1 = dataset[dataset[:, -1] == 1]
-    plt.scatter(p1[:, 0], p1[:, 1])
-
-    from bayes_reject.helpers import write_dataset
     write_dataset(dataset, 'bayes_reject/datasets/artificial.csv')
 
-    plt.show()
+    # plt.show()
