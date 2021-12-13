@@ -6,12 +6,13 @@ from bayes_mixture.quadratic_bayes import QuadraticBayes
 from bayes_mixture.realization import Realization
 from bayes_mixture.scores import Scores
 from bayes_mixture.normalizer import Normalizer
+from bayes_mixture.gmm import em
 import numpy as np
 import argparse
 
 # Import plotting modules, if they're available
 try:
-    from bayes_linear.plot_helper import plot_decision_surface, plot_pdf
+    from bayes_mixture.plot_helper import plot_gaussian_mixture_contour, plot_gaussian_mixture_3d
     import matplotlib.pyplot as plt
 
     plotting_available = True
@@ -52,6 +53,17 @@ except ModuleNotFoundError:
 #
 #     dataset = Dataset("bayes_linear/datasets/%s.csv" % args.dataset)
 #     return dataset, model
+
+def em_artificial_dataset():
+    x = Dataset("bayes_mixture/datasets/artificial.csv").load()
+    x = x[x[:, -1] == 0]
+    x = x[:, :-1]
+    k = 3
+    iterations, pi, mean, cov = em(x, k, log_error=True)
+
+    if plotting_available:
+        plot_gaussian_mixture_contour(points=x, pi=pi, mean=mean, cov=cov, min_x=-0.5, max_x=3.5, min_y=-0.5, max_y=3.5)
+        plot_gaussian_mixture_3d(points=x, pi=pi, mean=mean, cov=cov, min_x=-0.5, max_x=3.5, min_y=-0.5, max_y=3.5)
 
 
 def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
@@ -99,19 +111,22 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
     avg_realization.scores.print_confusion_matrix()
 
     # Plot decision surface
-    if dataset.shape[1] - 1 == 2 and plotting_available:
-        # Set models with the "mean weights"
-        model.means = avg_realization.means
-        model.cov_matrix = avg_realization.cov_matrix
-        plot_decision_surface(model,
-                              normalized_dataset,
-                              title="Íris",
-                              xlabel="X1",
-                              ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
+    # if dataset.shape[1] - 1 == 2 and plotting_available:
+    #     # Set models with the "mean weights"
+    #     model.means = avg_realization.means
+    #     model.cov_matrix = avg_realization.cov_matrix
+    #     plot_decision_surface(model,
+    #                           normalized_dataset,
+    #                           title="Íris",
+    #                           xlabel="X1",
+    #                           ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
 
 
 # Generate artificial dataset
 # generate_artificial_dataset()
+
+# Test the EM algorithm on the artificial dataset
+em_artificial_dataset()
 
 # # Dataset descriptors (lazy loaded)
 # # artificial_dataset = Dataset("bayes_linear/datasets/artificial.csv")
