@@ -1,5 +1,5 @@
 from bayes_mixture.helpers import train_test_split
-from bayes_mixture.dataset import Dataset
+from bayes_mixture.dataset import Dataset, generate_artificial_dataset
 from bayes_mixture.quadratic_bayes import QuadraticBayes
 # from bayes_linear.linear_bayes import LinearBayes, AGGREGATION_POOL, AGGREGATION_NAIVE,\
 #     AGGREGATION_DIAGONAL_VARIANCE, AGGREGATION_DIAGONAL_EQUAL_PRIORI
@@ -110,33 +110,36 @@ def evaluate(model, dataset, normalize=True, ratio=0.8, num_realizations=20):
                               ylabel="X4", legend={0: 'Setosa', 1: 'Versicolor', 2: 'Virgínica'})
 
 
-# Dataset descriptors (lazy loaded)
-# artificial_dataset = Dataset("bayes_linear/datasets/artificial.csv")
-# breast_cancer_dataset = Dataset("bayes_linear/datasets/breast-cancer.csv")
-# column_dataset = Dataset("bayes_linear/datasets/column.csv")
-# dermatology_dataset = Dataset("bayes_linear/datasets/dermatology.csv")
-iris_dataset = Dataset("bayes_linear/datasets/iris.csv")
+# Generate artificial dataset
+# generate_artificial_dataset()
+
+# # Dataset descriptors (lazy loaded)
+# # artificial_dataset = Dataset("bayes_linear/datasets/artificial.csv")
+# # breast_cancer_dataset = Dataset("bayes_linear/datasets/breast-cancer.csv")
+# # column_dataset = Dataset("bayes_linear/datasets/column.csv")
+# # dermatology_dataset = Dataset("bayes_linear/datasets/dermatology.csv")
+# iris_dataset = Dataset("bayes_linear/datasets/iris.csv")
+# #
+# # datasets = {
+# #     'artificial': artificial_dataset,
+# #     'breast-cancer': breast_cancer_dataset,
+# #     'column': column_dataset,
+# #     'dermatology': dermatology_dataset,
+# #     'iris': iris_dataset
+# # }
+# dataset = iris_dataset
 #
-# datasets = {
-#     'artificial': artificial_dataset,
-#     'breast-cancer': breast_cancer_dataset,
-#     'column': column_dataset,
-#     'dermatology': dermatology_dataset,
-#     'iris': iris_dataset
-# }
-dataset = iris_dataset
-
-# dataset, model = parse_args()
-
-split_ratio = 0.8
-num_realizations = 20
-
-# print("Dataset: {}".format(dataset.filename))
-model = QuadraticBayes()
-evaluate(model,
-         dataset.load(),
-         normalize=True,
-         ratio=split_ratio,
-         num_realizations=num_realizations)
+# # dataset, model = parse_args()
+#
+# split_ratio = 0.8
+# num_realizations = 20
+#
+# # print("Dataset: {}".format(dataset.filename))
+# model = QuadraticBayes()
+# evaluate(model,
+#          dataset.load(),
+#          normalize=True,
+#          ratio=split_ratio,
+#          num_realizations=num_realizations)
 
 print("Done!")

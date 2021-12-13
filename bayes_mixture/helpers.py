@@ -10,6 +10,13 @@ def load_dataset(filename):
     return df.to_numpy()
 
 
+def write_dataset(dataset, filename):
+    df = pd.DataFrame(dataset)
+    # Change last column to integer
+    df.iloc[:, -1] = df.iloc[:, -1].astype('int')
+    df.to_csv(filename, header=False, index=False)
+
+
 def train_test_split(dataset, ratio=0.8, shuffle=False):
     dataset_copy = dataset.copy()
     if shuffle:
